@@ -1,0 +1,607 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بطاقة عضوية نقابة المبرمجين العراقيين | علي الطائي</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#080c14',
+                            card: '#0d1527',
+                            orange: '#ff6b00',
+                            cyan: '#00f0ff',
+                            gold: '#ffd700',
+                            border: 'rgba(255, 255, 255, 0.12)'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        code: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons & QRCode Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #060911;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(255, 107, 0, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(13, 21, 39, 0.5) 0px, transparent 100%);
+            min-height: 100vh;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* Responsive Perspective Container */
+        .card-stage {
+            perspective: 1200px;
+            width: 100%;
+        }
+
+        /* 3D Card Engine */
+        .card-box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card-box.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 
+                        0 0 30px rgba(255, 107, 0, 0.12);
+        }
+
+        .card-back-face {
+            transform: rotateY(180deg);
+        }
+
+        /* Dynamic Holographic Reflection */
+        .holo-glare {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                125deg,
+                rgba(255,255,255,0) 20%,
+                rgba(255,255,255,0.08) 35%,
+                rgba(255,107,0,0.18) 48%,
+                rgba(0,240,255,0.18) 52%,
+                rgba(255,255,255,0.08) 65%,
+                rgba(255,255,255,0) 80%
+            );
+            background-size: 250% 250%;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-card {
+            background: rgba(13, 21, 39, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #060911; }
+        ::-webkit-scrollbar-thumb { background: #ff6b00; border-radius: 3px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between select-none">
+
+    <!-- Top Compact Header -->
+    <header class="w-full border-b border-white/10 bg-slate-950/80 backdrop-blur-md py-3 px-4 z-40">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-orange-600 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-orange-500/20 font-black">
+                    <i class="fa-solid fa-code text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm sm:text-base font-black text-white leading-none">نقابة المبرمجين العراقيين</h1>
+                    <p class="text-[10px] text-orange-400 font-mono tracking-wide mt-0.5">Iraqi Programmers Guild</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleFlip()" class="px-3.5 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-md shadow-orange-600/30">
+                    <i class="fa-solid fa-rotate text-xs"></i>
+                    <span>قلب البطاقة</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow flex flex-col items-center justify-center px-3 py-6 max-w-5xl mx-auto w-full">
+
+        <!-- Status Tag -->
+        <div class="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            بطاقة إلكترونية معتمدة ونشطة 2025 - 2028
+        </div>
+
+        <!-- 3D Card Stage (Always fits smoothly in all screens) -->
+        <div class="w-full max-w-[340px] xs:max-w-[390px] sm:max-w-[460px] md:max-w-[500px] aspect-[1.586/1] card-stage relative my-2">
+            
+            <div id="cardBox" class="card-box cursor-grab active:cursor-grabbing">
+                
+                <!-- ================= FRONT FACE ================= -->
+                <div id="cardFront" class="card-face bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-3.5 sm:p-5 flex flex-col justify-between relative overflow-hidden">
+                    
+                    <!-- Glare Effect -->
+                    <div id="glareFront" class="holo-glare"></div>
+                    
+                    <!-- Decorative Background Accents -->
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="absolute top-0 right-0 w-1.5 h-full bg-gradient-to-b from-orange-500 via-amber-400 to-orange-600"></div>
+
+                    <!-- CARD FRONT HEADER -->
+                    <div class="flex items-center justify-between relative z-10">
+                        <div class="flex items-center gap-2">
+                            <!-- Custom Emblem SVG -->
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-900/90 border border-orange-500/40 p-1 flex items-center justify-center shrink-0">
+                                <svg viewBox="0 0 100 100" class="w-full h-full">
+                                    <path d="M50 5 L85 20 V50 C85 70 50 92 50 92 C50 92 15 70 15 50 V20 Z" fill="none" stroke="#ff6b00" stroke-width="7"/>
+                                    <path d="M32 40 L46 25 L46 75 M68 40 L54 25 L54 75 M36 50 H64" stroke="#00f0ff" stroke-width="6" stroke-linecap="round"/>
+                                    <circle cx="50" cy="50" r="7" fill="#ff6b00"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-[9px] sm:text-[11px] font-black tracking-wide text-slate-200 leading-none">جمهورية العراق</h2>
+                                <h3 class="text-xs sm:text-base font-black text-orange-500 leading-tight">نقابة المبرمجين العراقيين غير رسمية</h3>
+                                <p class="text-[7px] sm:text-[9px] font-mono text-slate-400 tracking-wider">IRAQI PROGRAMMERS GUILD</p>
+                            </div>
+                        </div>
+
+                        <!-- Smart Chip Icon -->
+                        <div class="flex flex-col items-end gap-0.5 shrink-0">
+                            <div class="w-7 h-5 sm:w-9 sm:h-6 rounded bg-gradient-to-tr from-amber-200 via-yellow-500 to-amber-300 border border-amber-600 flex items-center justify-center shadow-inner relative overflow-hidden">
+                                <div class="w-full h-[1px] bg-amber-900/50 absolute top-1.5"></div>
+                                <div class="w-full h-[1px] bg-amber-900/50 absolute bottom-1.5"></div>
+                                <div class="h-full w-[1px] bg-amber-900/50 absolute left-2"></div>
+                                <div class="h-full w-[1px] bg-amber-900/50 absolute right-2"></div>
+                            </div>
+                            <span class="text-[7px] font-mono text-cyan-400 font-bold uppercase"><i class="fa-solid fa-wifi"></i> NFC</span>
+                        </div>
+                    </div>
+
+                    <!-- CARD FRONT BODY: Member Info & Photo -->
+                    <div class="grid grid-cols-12 gap-2 sm:gap-3 items-center relative z-10 my-auto">
+                        
+                        <!-- Photo Frame -->
+                        <div class="col-span-4 flex justify-center">
+                            <div class="relative w-16 h-20 xs:w-20 xs:h-24 sm:w-24 sm:h-28 rounded-xl p-0.5 bg-gradient-to-b from-orange-500 via-slate-700 to-cyan-500 shadow-md">
+                                <div class="w-full h-full rounded-lg bg-slate-950 overflow-hidden relative">
+                                    <img id="memberPhoto" 
+                                         src="ali-altaee.jpg" 
+                                         onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';" 
+                                         alt="علي الطائي" 
+                                         class="w-full h-full object-cover">
+                                </div>
+                                <span class="absolute -bottom-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 border-2 border-slate-950 flex items-center justify-center text-[8px] sm:text-[10px] text-white">
+                                    <i class="fa-solid fa-check"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Information -->
+                        <div class="col-span-8 pr-1 min-w-0">
+                            <div class="mb-1">
+                                <span class="text-[8px] sm:text-[9px] uppercase text-slate-400 font-bold block leading-none">الاسم الكامل / Name</span>
+                                <h4 class="text-sm xs:text-base sm:text-xl font-black text-white leading-tight truncate">علي الطائي</h4>
+                                <p class="text-[10px] sm:text-xs font-mono font-bold text-orange-400">Ali Altaee</p>
+                            </div>
+
+                            <div class="mb-1.5">
+                                <span class="text-[8px] sm:text-[9px] uppercase text-slate-400 font-bold block leading-none">التخصص / Title</span>
+                                <div class="inline-block bg-orange-500/15 border border-orange-500/40 text-orange-300 font-bold text-[9px] sm:text-xs px-2 py-0.5 rounded mt-0.5 max-w-full truncate">
+                                    مطور ويب ومبرمج تطبيقات
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-1 text-[8px] sm:text-[10px] font-mono border-t border-slate-800 pt-1">
+                                <div>
+                                    <span class="text-slate-400 block text-[7px] sm:text-[8px] font-sans">الإصدار</span>
+                                    <span class="text-slate-200 font-bold">2025</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block text-[7px] sm:text-[8px] font-sans">النفاذ</span>
+                                    <span class="text-emerald-400 font-bold">2028</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- CARD FRONT FOOTER: ID & Embedded Clean QR Code -->
+                    <div class="flex items-center justify-between border-t border-slate-800/80 pt-1.5 relative z-10">
+                        <div class="min-w-0">
+                            <span class="text-[7px] sm:text-[8px] text-slate-400 font-bold block uppercase leading-none">رقم العضوية / Member ID</span>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="font-mono text-xs sm:text-sm font-black text-cyan-400 tracking-wide truncate" id="memberId">IQ-PRG-2025-8842</span>
+                                <button onclick="copyId()" class="text-slate-500 hover:text-cyan-400 text-xs transition px-1" title="نسخ">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Embedded QR Code Box (Perfect Alignment) -->
+                        <div class="flex items-center gap-1.5 shrink-0 bg-white p-1 rounded-lg border border-slate-300 shadow-sm">
+                            <div id="qrCodeContainer" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ================= BACK FACE ================= -->
+                <div id="cardBack" class="card-face card-back-face bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-3.5 sm:p-5 flex flex-col justify-between relative overflow-hidden">
+                    
+                    <!-- Glare Effect Back -->
+                    <div id="glareBack" class="holo-glare"></div>
+
+                    <!-- Magnetic Strip -->
+                    <div class="-mx-5 -mt-5 w-[calc(100%+2.5rem)] h-7 sm:h-9 bg-slate-950 border-b border-slate-800 relative">
+                        <div class="w-full h-2 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 top-2 relative"></div>
+                    </div>
+
+                    <!-- Back Body Content -->
+                    <div class="flex-grow flex flex-col justify-between relative z-10 py-1 space-y-1.5">
+                        
+                        <!-- Signature Section -->
+                        <div class="grid grid-cols-12 gap-2 items-center">
+                            <div class="col-span-8">
+                                <span class="text-[8px] text-slate-400 block mb-0.5">التوقيع المعتمد / Authorized Signature</span>
+                                <div class="h-6 sm:h-7 bg-slate-100 rounded px-2 flex items-center justify-between text-slate-900 font-serif italic text-xs font-bold border border-slate-400">
+                                    <span>Ali Altaee</span>
+                                    <span class="text-[7px] font-mono text-slate-500 not-italic">VERIFIED</span>
+                                </div>
+                            </div>
+                            <div class="col-span-4 text-center">
+                                <span class="text-[7px] sm:text-[8px] text-slate-400 block">رمز الأمان</span>
+                                <span class="font-mono text-[10px] sm:text-xs text-amber-400 font-bold">SEC-8842</span>
+                            </div>
+                        </div>
+
+                        <!-- Contact Matrix -->
+                        <div class="bg-slate-900/90 rounded-lg p-2 border border-slate-800 text-[9px] sm:text-xs space-y-1">
+                            <div class="flex items-center gap-2 text-slate-300 truncate">
+                                <i class="fa-solid fa-location-dot text-orange-500 w-3"></i>
+                                <span class="truncate">العراق - بابل - مركز الحلة</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-slate-300 truncate">
+                                <i class="fa-solid fa-envelope text-cyan-400 w-3"></i>
+                                <span class="font-mono truncate">alialtaee@gmail.com</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-slate-300 truncate">
+                                <i class="fa-brands fa-whatsapp text-emerald-400 w-3"></i>
+                                <span class="font-mono truncate">واتساب وتلجرام: @altaee_z</span>
+                            </div>
+                        </div>
+
+                        <!-- Legal Text -->
+                        <p class="text-[7px] sm:text-[8px] text-slate-400 text-justify leading-snug">
+                            هذه البطاقة وثيقة رسمية صادرة عن نقابة المبرمجين العراقيين لإثبات الهوية التخصصية. في حال العثور عليها يرجى إعادة تسليمها لمقر النقابة.
+                        </p>
+
+                        <!-- Barcode Footer -->
+                        <div class="flex items-center justify-between border-t border-slate-800 pt-1">
+                            <span class="font-mono text-[8px] sm:text-[9px] text-slate-400">www.ali-altaee.free.nf</span>
+                            <div class="flex items-center gap-[2px] h-4 sm:h-5">
+                                <div class="w-1 h-full bg-slate-300"></div>
+                                <div class="w-0.5 h-full bg-slate-300"></div>
+                                <div class="w-2 h-full bg-slate-300"></div>
+                                <div class="w-1 h-full bg-slate-300"></div>
+                                <div class="w-0.5 h-full bg-slate-300"></div>
+                                <div class="w-1.5 h-full bg-slate-300"></div>
+                                <div class="w-0.5 h-full bg-slate-300"></div>
+                                <div class="w-2 h-full bg-slate-300"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Touch / Hover Hint -->
+        <p class="text-slate-400 text-xs mt-2 mb-5 flex items-center gap-2 text-center">
+            <i class="fa-solid fa-hand-pointer text-orange-400 animate-bounce"></i>
+            حرك الماوس أو اللمس لرؤية التأثير التفاعلي 3D وانعكاس الهولوجرام
+        </p>
+
+        <!-- Clean, Simplified Essential Action Bar -->
+        <div class="w-full max-w-md grid grid-cols-3 gap-3 mb-8">
+            <button onclick="toggleFlip()" class="glass-card hover:bg-orange-600/20 hover:border-orange-500/50 text-white p-3 rounded-2xl flex flex-col items-center justify-center gap-1 transition group">
+                <i class="fa-solid fa-rotate text-orange-400 text-lg group-hover:rotate-180 transition duration-500"></i>
+                <span class="text-xs font-bold">قلب البطاقة</span>
+            </button>
+
+            <button onclick="downloadCard()" class="glass-card hover:bg-cyan-600/20 hover:border-cyan-500/50 text-white p-3 rounded-2xl flex flex-col items-center justify-center gap-1 transition group">
+                <i class="fa-solid fa-download text-cyan-400 text-lg group-hover:scale-110 transition"></i>
+                <span class="text-xs font-bold">تحميل صورة</span>
+            </button>
+
+            <a href="http://www.ali-altaee.free.nf" target="_blank" class="glass-card hover:bg-emerald-600/20 hover:border-emerald-500/50 text-white p-3 rounded-2xl flex flex-col items-center justify-center gap-1 transition group text-center">
+                <i class="fa-solid fa-globe text-emerald-400 text-lg group-hover:scale-110 transition"></i>
+                <span class="text-xs font-bold">زيارة الموقع</span>
+            </a>
+        </div>
+
+        <!-- Clean Infographic Profile Section -->
+        <div class="w-full max-w-3xl glass-card rounded-3xl p-5 sm:p-7 border border-white/10 shadow-2xl">
+            <div class="flex items-center justify-between mb-5 border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-id-card text-orange-500 text-xl"></i>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-black text-white">الملف المهني والتقني للعضو</h3>
+                        <p class="text-xs text-slate-400">سجل العضوية المعتمد لدى نقابة المبرمجين العراقيين</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 bg-orange-500/10 text-orange-400 text-xs font-bold rounded-lg border border-orange-500/30 shrink-0">
+                    عضو معتمد
+                </span>
+            </div>
+
+            <!-- Infographic Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-400 text-lg shrink-0">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] text-slate-400 font-bold block">التخصص الرئيسي</span>
+                        <h4 class="text-xs sm:text-sm font-bold text-slate-100 truncate">مطور ويب وتطبيقات</h4>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg shrink-0">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] text-slate-400 font-bold block">مقر الفرع</span>
+                        <h4 class="text-xs sm:text-sm font-bold text-slate-100 truncate">بابل - الحلة</h4>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/80 rounded-2xl p-3.5 border border-slate-800 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg shrink-0">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <span class="text-[10px] text-slate-400 font-bold block">صلاحية العضوية</span>
+                        <h4 class="text-xs sm:text-sm font-bold text-emerald-400 truncate">نشطة حتى 2028</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tech Badges -->
+            <div class="bg-slate-900/60 rounded-2xl p-4 border border-slate-800">
+                <h4 class="text-xs font-bold text-slate-300 mb-2.5 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-orange-400"></i>
+                    التقنيات المعتمدة:
+                </h4>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-slate-800 text-slate-200 text-xs font-mono rounded-xl border border-slate-700 flex items-center gap-1.5">
+                        <i class="fa-brands fa-html5 text-orange-500"></i> HTML5 / CSS3
+                    </span>
+                    <span class="px-3 py-1 bg-slate-800 text-slate-200 text-xs font-mono rounded-xl border border-slate-700 flex items-center gap-1.5">
+                        <i class="fa-brands fa-js text-yellow-400"></i> JavaScript ES6+
+                    </span>
+                    <span class="px-3 py-1 bg-slate-800 text-slate-200 text-xs font-mono rounded-xl border border-slate-700 flex items-center gap-1.5">
+                        <i class="fa-brands fa-react text-cyan-400"></i> React / Mobile Apps
+                    </span>
+                    <span class="px-3 py-1 bg-slate-800 text-slate-200 text-xs font-mono rounded-xl border border-slate-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-database text-purple-400"></i> Databases & APIs
+                    </span>
+                </div>
+            </div>
+
+            <!-- Direct Contact Links -->
+            <div class="mt-5 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <span class="text-xs text-slate-400 font-bold">التواصل المباشر مع علي الطائي:</span>
+                <div class="flex items-center gap-2">
+                    <a href="https://wa.me/?text=مرحبا%20علي" target="_blank" class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition flex items-center justify-center" title="واتساب">
+                        <i class="fa-brands fa-whatsapp text-base"></i>
+                    </a>
+                    <a href="https://t.me/altaee_z" target="_blank" class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white transition flex items-center justify-center" title="تلجرام">
+                        <i class="fa-brands fa-telegram text-base"></i>
+                    </a>
+                    <a href="mailto:alialtaee@gmail.com" class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500 hover:text-white transition flex items-center justify-center" title="البريد الإلكتروني">
+                        <i class="fa-regular fa-envelope text-base"></i>
+                    </a>
+                    <a href="http://www.ali-altaee.free.nf" target="_blank" class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white transition flex items-center justify-center" title="رابط الموقع">
+                        <i class="fa-solid fa-link text-base"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-orange-600 text-white font-bold text-xs px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition duration-300 z-50">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">تم النسخ بنجاح!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full border-t border-slate-800 py-3 text-center text-xs text-slate-400 bg-slate-950">
+        <p>© 2025 - نقابة المبرمجين العراقيين | المهندس <strong>علي الطائي (Ali Altaee)</strong></p>
+    </footer>
+
+    <script>
+        const cardBox = document.getElementById('cardBox');
+        const glareFront = document.getElementById('glareFront');
+        const glareBack = document.getElementById('glareBack');
+        let isFlipped = false;
+
+        // Toggle Flip
+        function toggleFlip() {
+            isFlipped = !isFlipped;
+            cardBox.classList.toggle('flipped', isFlipped);
+        }
+
+        // Mouse Move 3D Physics
+        const stage = document.querySelector('.card-stage');
+
+        stage.addEventListener('mousemove', (e) => {
+            const rect = stage.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -12;
+            const rotateY = ((x - centerX) / centerX) * 12;
+
+            if (!isFlipped) {
+                cardBox.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            } else {
+                cardBox.style.transform = `rotateX(${rotateX}deg) rotateY(${180 + rotateY}deg)`;
+            }
+
+            const posX = (x / rect.width) * 100;
+            const posY = (y / rect.height) * 100;
+            
+            glareFront.style.backgroundPosition = `${posX}% ${posY}%`;
+            glareBack.style.backgroundPosition = `${posX}% ${posY}%`;
+        });
+
+        stage.addEventListener('mouseleave', () => {
+            cardBox.style.transform = isFlipped ? 'rotateX(0deg) rotateY(180deg)' : 'rotateX(0deg) rotateY(0deg)';
+        });
+
+        // Mobile Touch Gestures
+        stage.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                const touch = e.touches[0];
+                const rect = stage.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -10;
+                const rotateY = ((x - centerX) / centerX) * 10;
+
+                cardBox.style.transform = isFlipped 
+                    ? `rotateX(${rotateX}deg) rotateY(${180 + rotateY}deg)` 
+                    : `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            }
+        });
+
+        stage.addEventListener('touchend', () => {
+            cardBox.style.transform = isFlipped ? 'rotateX(0deg) rotateY(180deg)' : 'rotateX(0deg) rotateY(0deg)';
+        });
+
+        // Initialize Clean Embedded QR Code
+        window.addEventListener('DOMContentLoaded', () => {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: "http://www.ali-altaee.free.nf",
+                width: 40,
+                height: 40,
+                colorDark: "#080c14",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        });
+
+        // Copy Member ID
+        function copyId() {
+            const idText = document.getElementById('memberId').innerText;
+            const temp = document.createElement("input");
+            temp.value = idText;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            showToast("تم نسخ رقم العضوية: " + idText);
+        }
+
+        // Show Notification Toast
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Download Card as PNG Image
+        function downloadCard() {
+            showToast("جاري تجهيز صورة البطاقة للتحميل...");
+            const target = isFlipped ? document.getElementById('cardBack') : document.getElementById('cardFront');
+
+            html2canvas(target, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: null
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `بطاقة_نقابة_المبرمجين_علي_الطائي_${isFlipped ? 'خلفي' : 'امامي'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast("تم تحميل البطاقة بنجاح!");
+            }).catch(() => {
+                showToast("حدث خطأ أثناء تحميل الصورة.");
+            });
+        }
+    </script>
+</body>
+</html>
